@@ -45,7 +45,7 @@ ROOT_URLCONF = 'main.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'app', 'templates')],  # <-- esta línea
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,3 +120,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # VARIABLES QUE INTEGRAN LOS REDIRECTS DE AUTH
 LOGIN_REDIRECT_URL = 'index-page'
 LOGOUT_REDIRECT_URL = 'index-page'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'tuapp@gmail.com'
+EMAIL_HOST_PASSWORD = 'clave_aplicacion_gmail'  # generada desde tu cuenta
+
+

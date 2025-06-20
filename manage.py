@@ -2,9 +2,12 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
 
 
 def main():
+    import os
+    print("📂 TEMPLATE DIR desde manage.py:", os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'templates'))
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
     try:

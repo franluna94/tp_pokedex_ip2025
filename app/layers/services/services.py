@@ -5,14 +5,17 @@ from ...config import config
 from ..persistence import repositories
 from ..utilities import translator
 from django.contrib.auth import get_user
+from app.models import Favourite
 
 # función que devuelve un listado de cards. Cada card representa una imagen de la API de Pokemon
 def getAllImages():
     # debe ejecutar los siguientes pasos:
     # 1) traer un listado de imágenes crudas desde la API (ver transport.py)
+    raw_images = transport.getAllImages()
     # 2) convertir cada img. en una card.
+    cards = [translator.fromRequestIntoCard(img) for img in raw_images]
     # 3) añadirlas a un nuevo listado que, finalmente, se retornará con todas las card encontradas.
-    pass
+    return cards
 
 # función que filtra según el nombre del pokemon.
 def filterByCharacter(name):
@@ -29,33 +32,60 @@ def filterByType(type_filter):
     filtered_cards = []
 
     for card in getAllImages():
-        # debe verificar si la casa de la card coincide con la recibida por parámetro. Si es así, se añade al listado de filtered_cards.
-        filtered_cards.append(card)
+        if type_filter in card.types:
+            filtered_cards.append(card)
 
     return filtered_cards
 
-# añadir favoritos (usado desde el template 'home.html')
-def saveFavourite(request):
-    fav = '' # transformamos un request en una Card (ver translator.py)
-    fav.user = get_user(request) # le asignamos el usuario correspondiente.
 
-    return repositories.save_favourite(fav) # lo guardamos en la BD.
+# añadir favoritos (usado desde el template 'home.html')
+from django.contrib.auth import get_user
+from app.layers.utilities.translator import fromTemplateIntoCard
+from app.layers.persistence import repositories
+
+
+def saveFavourite(request):
+    user = get_user(request)
+
+    # Paso 1: transformar el request en una Card
+    fav = fromTemplateIntoCard(request)
+
+    # Paso 2: asignarle el usuario autenticado
+    fav.user = user
+
+    # Paso 3: guardar el favorito en la base
+    return repositories.save_favourite(fav)# lo guardamos en la BD.
 
 # usados desde el template 'favourites.html'
+from django.contrib.auth import get_user
+from app.models import Favourite
+from app.layers.utilities.translator import fromRepositoryIntoCard
+
 def getAllFavourites(request):
     if not request.user.is_authenticated:
         return []
-    else:
-        user = get_user(request)
 
-        favourite_list = [] # buscamos desde el repositories.py TODOS Los favoritos del usuario (variable 'user').
-        mapped_favourites = []
+    user = get_user(request)
+    favourite_list = Favourite.objects.filter(user=user)
 
-        for favourite in favourite_list:
-            card = '' # convertimos cada favorito en una Card, y lo almacenamos en el listado de mapped_favourites que luego se retorna.
-            mapped_favourites.append(card)
+    mapped_favourites = [
+        fromRepositoryIntoCard({
+            'id': fav.id,
+            'name': fav.name,
+            'height': fav.height,
+            'weight': fav.weight,
+            'base_experience': 0,
+            'types': fav.types,
+            'image': fav.image
+        })
+        for fav in favourite_list
+    ]
 
-        return mapped_favourites
+    return mapped_favourites
+    
+def getAllFavouritesByUser(user):
+    return Favourite.objects.filter(user=user)
+
 
 def deleteFavourite(request):
     favId = request.POST.get('id')
@@ -67,3 +97,4 @@ def get_type_icon_url_by_name(type_name):
     if not type_id:
         return None
     return transport.get_type_icon_url_by_id(type_id)
+

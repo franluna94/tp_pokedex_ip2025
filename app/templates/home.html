@@ -31,13 +31,19 @@
         </form>
     </div>
 
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div id="loading-spinner" class="text-center my-5" style="display: none;">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando Pokémon...</p>
+        </div>
+        <div id="cards-container" class="row row-cols-1 row-cols-md-3 g-4">
         {% if images|length == 0 %}
         <h2 class="text-center">La búsqueda no arrojó resultados...</h2>
         {% else %} {% for img in images %}
         <div class="col">
             <!-- evaluar si la imagen pertenece al tipo fuego, agua o planta -->
-            <div class="card border-success mb-3 ms-5" style="max-width: 540px; ">
+            <div class="card mb-3 ms-5 border-{% if 'grass' in img.types %}success{% elif 'fire' in img.types %}danger{% elif 'water' in img.types %}primary{% else %}warning{% endif %}" style="max-width: 540px;">
                  <div class="row g-0">
                      <div class="col-md-4">
                          <img src="{{ img.image }}" class="card-img-top"alt="imagen">
@@ -80,3 +86,18 @@
     </div>
 </main>
 {% endblock %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const spinner = document.getElementById("loading-spinner");
+    const cards = document.getElementById("cards-container");
+
+    spinner.style.display = "block";
+    cards.style.display = "none";
+
+    // Simulamos carga por 1 segundo
+    setTimeout(() => {
+      spinner.style.display = "none";
+      cards.style.display = "flex";
+    }, 1000);
+  });
+</script>
