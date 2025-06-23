@@ -1,6 +1,7 @@
 # capa de vista/presentación
 
 from django.shortcuts import redirect, render
+from app.models import Favourite
 from .layers.services import services
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -88,13 +89,11 @@ def saveFavourite(request):
 
 @login_required
 def deleteFavourite(request):
-    from .models import Favourite
-    name = request.POST.get("name")
-
-    Favourite.objects.filter(user=request.user, name=name).delete()
-
-    return redirect('home')   # o 'home' si preferís volver a la galería
-
+    if request.method == 'POST':
+        fav_id=request.POST.get("id")
+        Favourite.objects.filter(user=request.user, id=fav_id).delete()
+    return redirect('favoritos')
+    
 
 @login_required
 def exit(request):
