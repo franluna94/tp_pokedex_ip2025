@@ -86,18 +86,3 @@
     </div>
 </main>
 {% endblock %}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const spinner = document.getElementById("loading-spinner");
-    const cards = document.getElementById("cards-container");
-
-    spinner.style.display = "block";
-    cards.style.display = "none";
-
-    // Simulamos carga por 1 segundo
-    setTimeout(() => {
-      spinner.style.display = "none";
-      cards.style.display = "flex";
-    }, 1000);
-  });
-</script>

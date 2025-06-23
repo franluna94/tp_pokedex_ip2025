@@ -117,18 +117,6 @@ def registro(request):
                     last_name=form.cleaned_data['last_name']
                 )
 
-                # ✉️ OPCIONAL: envío de correo de bienvenida
-                try:
-                    send_mail(
-                        '🎉 Registro exitoso en Pokédex',
-                        f"Hola {user.first_name}, ¡gracias por registrarte! Tu usuario es: {user.username}",
-                        'tucorreo@gmail.com',
-                        [user.email],
-                        fail_silently=False,
-                    )
-                except Exception as e:
-                     print("⚠️ Error al enviar correo:", e)
-
                 login(request, user)
                 messages.success(request, f"🟢 ¡Bienvenido {user.first_name}! Ya sos parte de la Pokédex.")
                 return redirect('home')
